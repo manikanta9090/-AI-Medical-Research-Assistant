@@ -43,6 +43,12 @@ ${data.overview || ""}
 
 Insights:
 ${(data.insights || []).map(i => "- " + i).join("\n")}
+
+Summary:
+${data.summary || ""}
+
+Suggestions:
+${(data.suggestions || []).map(s => "- " + s).join("\n")}
 `;
 
       // UPDATE ACTIVE CONVERSATION
