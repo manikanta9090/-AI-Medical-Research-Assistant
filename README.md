@@ -1,5 +1,5 @@
 <img width="1908" height="855" alt="image" src="https://github.com/user-attachments/assets/45453747-db81-493a-9970-815958e8c936" />
-
+live link : ai-medical-research-assistant-black.vercel.app
 
 # 🧠 AI Medical Research Assistant
 
