@@ -13,12 +13,8 @@ app.get('/health', (req, res) => {
   res.json({ message: 'Server is running' });
 });
 
-app.post('/chat', (req, res) => {
-  res.json({ 
-    message: 'Chat endpoint placeholder response',
-    received: req.body 
-  });
-});
+const chatRoutes = require('./routes/chatRoutes');
+app.use('/api', chatRoutes);
 
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB connected'))

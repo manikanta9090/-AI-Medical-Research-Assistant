@@ -2,7 +2,7 @@ import Home from "./pages/Home";
 
 function App() {
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-black text-white">
+    <div className="h-screen w-screen overflow-hidden">
       <Home />
     </div>
   );

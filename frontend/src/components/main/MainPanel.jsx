@@ -1,45 +1,95 @@
+import { useState } from "react";
 import InputBar from "@/components/common/InputBar";
 import ChatSection from "./ChatSection";
 
-export default function MainPanel({ messages, setMessages, setResearchData }) {
+export default function MainPanel({ 
+  messages, 
+  setMessages, 
+  setConversations,
+  activeChatId,
+  setResearchData, 
+  updateTitle, 
+  updateContext,
+  patientContext,
+  isNewChat 
+}) {
+  const [loading, setLoading] = useState(false);
+
   const handleSend = async (input) => {
-    setMessages((prev) => [...prev, { role: "user", content: input }]);
+    if (!input.trim()) return;
 
-    // TEMP: Dummy structured response
-    const dummyResponse = {
-      overview: `Research results for "${input}"`,
-      insights: [
-        "Immunotherapy improves survival",
-        "Targeted therapy is effective",
-      ],
-      summary: "Latest studies show strong progress.",
-      suggestions: ["More trials", "New drugs"],
-    };
+    // Auto-title for new chat
+    if (isNewChat && updateTitle) {
+      const title = input.length > 25 ? input.substring(0, 25) + "..." : input;
+      updateTitle(title);
+    }
 
-    // Add assistant message
-    setMessages((prev) => [
-      ...prev,
-      { role: "assistant", data: dummyResponse },
-    ]);
+    setLoading(true);
 
-    // 🔥 THIS IS IMPORTANT
-    setResearchData([
-      {
-        title: "Sample Research Paper",
-        year: 2024,
-        summary: "Important findings on treatment",
-      },
-    ]);
+    try {
+      const res = await fetch("http://localhost:5000/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: input }),
+      });
+
+      const data = await res.json();
+
+      const formattedText = `
+Overview:
+${data.overview || ""}
+
+Insights:
+${(data.insights || []).map(i => "- " + i).join("\n")}
+`;
+
+      // UPDATE ACTIVE CONVERSATION
+      setConversations((prev) =>
+        prev.map((chat) => {
+          if (chat.id === activeChatId) {
+            return {
+              ...chat,
+              messages: [
+                ...(Array.isArray(chat.messages) ? chat.messages : []),
+                { role: "user", content: input },
+                { role: "assistant", content: formattedText },
+              ],
+            };
+          }
+          return chat;
+        })
+      );
+
+      // KEEP RESEARCH PANEL WORKING
+      setResearchData({
+        publications: data.publications || [],
+        trials: data.trials || [],
+      });
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full w-full text-white">
 
-      <div className="flex-1 overflow-hidden">
-        <ChatSection messages={messages} />
+      <div className="h-14 flex items-center px-4 border-b border-gray-700">
+        <h1 className="text-sm text-gray-400">
+          AI Medical Research Assistant
+        </h1>
       </div>
 
-      <InputBar onSend={handleSend} />
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <ChatSection messages={messages} loading={loading} />
+      </div>
+
+      <InputBar onSend={handleSend} disabled={loading} />
+
     </div>
   );
 }
