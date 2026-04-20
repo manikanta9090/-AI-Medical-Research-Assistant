@@ -27,7 +27,7 @@ export default function MainPanel({
     setLoading(true);
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL || "https://your-backend.onrender.com";
+      const API_URL = import.meta.env.VITE_API_URL || "https://ai-medical-research-assistant-1-how2.onrender.com/api/chat";
       const res = await fetch(`${API_URL}/api/chat`, {
         method: "POST",
         headers: {
